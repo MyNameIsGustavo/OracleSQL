@@ -1,0 +1,2 @@
+USE PythonSQL
+SELECT * FROM Vendas
