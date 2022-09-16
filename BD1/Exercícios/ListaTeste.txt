@@ -1,0 +1,73 @@
+--Comandos DDL - Lista02;
+CREATE TABLE Tb_Cliente
+(   CodCliente number(5) PRIMARY KEY,
+    NomeCliente varchar2(40),
+    Endereco varchar2(30),
+    Cidade varchar2(20),
+    CEP varchar2(10),
+    UF char(10)
+)
+
+CREATE TABLE Tb_Vendedor
+(   CodVendedor number(5) PRIMARY KEY,
+    NomeVendedor varchar2(30),
+    FaixaComissao number(4,2),
+    SalarioFixo number(7,2)
+)
+
+CREATE TABLE Tb_Pedido
+(   NumPedido number(5) PRIMARY KEY,
+    PrazoEntrega date,
+    CodCliente number(5) references Tb_Cliente,
+    CodVendedor number(5) references Tb_Vendedor
+)
+
+CREATE TABLE Tb_Produto
+(   CodProduto number(5) PRIMARY KEY,
+    Descricao varchar2(20),
+    Unidade char(2),
+    ValorUnitario number(6,2)
+)
+
+CREATE TABLE Tb_ItemPedido
+(   NumPedido number(5)  references Tb_Pedido,
+    CodProduto number(5) references Tb_Produto,
+    Quantidade number(3)
+)
+
+ALTER TABLE Tb_Vendedor ADD (DataNascimento date);
+
+ALTER TABLE Tb_Cliente ADD (Regiao varchar2(20));
+ALTER TABLE Tb_Cliente MODIFY (NomeCliente varchar2(50));
+ALTER TABLE Tb_Cliente DROP COLUMN Regiao;
+
+--Comandos DML - Lista02;
+INSERT INTO Tb_Cliente VALUES(001,'Gustavo','Rua Bairro Cidade', 'Sorocaba', '00000000', 'Sao Paulo', 'Sao Paulo');
+INSERT INTO Tb_Cliente VALUES(002,'Joao','Rua Bairro Cidade', 'Sorocaba', '00000001', 'Sao Paulo', 'Sao Paulo');
+INSERT INTO Tb_Cliente VALUES(003,'Maria','Rua Bairro Cidade', 'Sorocaba', '00000002', 'Sao Paulo', 'Sao Paulo');
+INSERT INTO Tb_Cliente VALUES(004,'Ana','Rua Bairro Cidade', 'Sorocaba', '00000003', 'Sao Paulo', 'Sao Paulo');
+INSERT INTO Tb_Cliente VALUES(005,'Renato','Rua Bairro Cidade', 'Sorocaba', '00000004', 'Sao Paulo', 'Sao Paulo');
+
+INSERT INTO Tb_Vendedor VALUES(001,'Jose',0.7, 5000,'12/03/2003');
+INSERT INTO Tb_Vendedor VALUES(002,'Fatima',0.7, 5000,'12/03/2004');
+INSERT INTO Tb_Vendedor VALUES(003,'Munari',0.3, 5000,'12/03/2005');
+INSERT INTO Tb_Vendedor VALUES(004,'Mauricio',0.3, 5000,'12/03/2006');
+INSERT INTO Tb_Vendedor VALUES(005,'Cassio',0.3, 5000,'12/03/2007');
+
+INSERT INTO Tb_Pedido VALUES(001,'01/01/2000',001,001);
+INSERT INTO Tb_Pedido VALUES(002,'02/01/2000',002,002);
+INSERT INTO Tb_Pedido VALUES(003,'03/01/2000',003,003);
+INSERT INTO Tb_Pedido VALUES(004,'04/01/2000',004,004);
+INSERT INTO Tb_Pedido VALUES(005,'05/01/2000',005,005);
+
+INSERT INTO Tb_Produto VALUES(001,'Disponivel','KG',100);
+INSERT INTO Tb_Produto VALUES(002,'Disponivel','KG',100);
+INSERT INTO Tb_Produto VALUES(003,'Disponivel','LT',300);
+INSERT INTO Tb_Produto VALUES(004,'Disponivel','LT',300);
+INSERT INTO Tb_Produto VALUES(005,'Disponivel','CX',200);
+
+-- INSERT INTO Tb_ItemPedido VALUES(001,002,100);
+-- INSERT INTO Tb_ItemPedido VALUES(002,003,200);
+-- INSERT INTO Tb_ItemPedido VALUES(003,004,500);
+-- INSERT INTO Tb_ItemPedido VALUES(004,001,300);
+-- INSERT INTO Tb_ItemPedido VALUES(005,001,200);
