@@ -35,7 +35,7 @@ INSERT INTO VEICULO VALUES ('FTZ8809','HB20','01/01/2019', 'Azul');
 INSERT INTO VEICULO VALUES ('GHT','GOLF','01/01/2021', 'Prata');
 
 INSERT INTO TIPOMULTA VALUES (100,'GRAVE');
-INSERT INTO TIPOMULTA VALUES (120,'GRAVÕSSIMA');
+INSERT INTO TIPOMULTA VALUES (120,'GRAV√çSSIMA');
 INSERT INTO TIPOMULTA VALUES (130,'LEVE');
 
 INSERT INTO MOTORISTA VALUES (11111, 'Henrique Silva', 'M', 'Sorocaba', '09/05/2000', 'henriquesilva@gmail.com', 'S');
@@ -44,7 +44,7 @@ INSERT INTO MOTORISTA VALUES (33333, 'Larissa Santos Oliveira', 'F', 'Sorocaba',
 INSERT INTO MOTORISTA VALUES (44444, 'Carla Augusta', 'F', 'Votorantim', '05/04/2002', 'Carla@uol.com', 'N');
 INSERT INTO MOTORISTA VALUES (55555, 'Carlos Oliveira Santos', 'M', 'Votorantim', '05/04/2003', 'Carlao@uol.com', 'N');
 			
--- A tabela Multa possui 1 chave prim·ria e 3 chaves estrangeiras, porÈm estas n„o est„o no script apresentado. Usando o comando Alter table, crie estas chaves dando nome ‡s constraints.
+-- A tabela Multa possui 1 chave prim√°ria e 3 chaves estrangeiras, por√©m estas n√£o est√£o no script apresentado. Usando o comando Alter table, crie estas chaves dando nome √†s constraints.
 ALTER TABLE Multa ADD CONSTRAINT PK_Multa_NumMulta PRIMARY KEY (NumMulta);
 
 ALTER TABLE Multa ADD CONSTRAINT FK_Multa_TipoMulta FOREIGN KEY (codtipoMulta) REFERENCES TipoMulta;
@@ -70,14 +70,14 @@ ALTER TABLE Motorista ADD DataCNH DATE;
 
 --Excluir as multas que possuam o valor da multa nulo.
 DELETE Multa 
-WHERE ValorMulta = 0.00;
+WHERE ValorMulta is NULL;
 
---Atualizar o atributo cor da tabela de veiculo para ëVermelhoí e Modelo = ëCretaí para o veiculo de placa = 'GEE2345';
+--Atualizar o atributo cor da tabela de veiculo para ‚ÄòVermelho‚Äô e Modelo = ‚ÄòCreta‚Äô para o veiculo de placa = 'GEE2345';
 UPDATE Veiculo 
 SET cor='Vermelho' 
 WHERE modelo ='Creta' and placaVeiculo = 'GEE2345';
 
--- Exibir todos os atributos dos motoristas que possuem  ëSantosí no final do nome. 
+-- Exibir todos os atributos dos motoristas que possuem  ‚ÄòSantos‚Äô no final do nome. 
 SELECT * FROM Motorista 
 WHERE NomeMotorista LIKE '%Santos';
 
@@ -86,9 +86,10 @@ SELECT NomeMotorista FROM Motorista
 WHERE Sexo = 'M' and CidadeNasc = 'Votorantim'
 ORDER BY NomeMotorista;
 
--- Exibir a CNH, Nome do motorista e data de nascimento para todos os motoristas com menos de 25 anos (n„o fixar a data, usar Sysdate).
--- Quest„o anulada;
+-- Exibir a CNH, Nome do motorista e data de nascimento para todos os motoristas com menos de 25 anos (n√£o fixar a data, usar Sysdate).
+SELECT CNH, NomeMotorista, DataNasc FROM Motorista 
+WHERE ((sysdate - DataNasc) / 365.25) < 25;
 
--- Listar  o valor das Multas aumentado em 10% para as tuplas em que o campo CodTipoMulta = 120 e o campo PontuaÁ„o estiver entre 4 e 8 pontos. Colocar um cabeÁalho para a coluna derivada.
+-- Listar  o valor das Multas aumentado em 10% para as tuplas em que o campo CodTipoMulta = 120 e o campo Pontua√ß√£o estiver entre 4 e 8 pontos. Colocar um cabe√ßalho para a coluna derivada.
 SELECT ValorMulta * 1.1 "NovoValor" FROM Multa
-WHERE CodTipoMulta = 120 and Pontuacao >= 4 and Pontuacao <= 8;
+WHERE CodTipoMulta = 120 and Pontuacao BETWEEN 4 AND 8;
