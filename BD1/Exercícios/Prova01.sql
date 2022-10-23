@@ -88,7 +88,7 @@ ORDER BY NomeMotorista;
 
 -- Exibir a CNH, Nome do motorista e data de nascimento para todos os motoristas com menos de 25 anos (não fixar a data, usar Sysdate).
 SELECT CNH, NomeMotorista, DataNasc FROM Motorista 
-WHERE ((sysdate - DataNasc) / 365.25) < 25;
+WHERE ((sysdate - DataNasc)) / 365.25 < 25;
 
 -- Listar  o valor das Multas aumentado em 10% para as tuplas em que o campo CodTipoMulta = 120 e o campo Pontuação estiver entre 4 e 8 pontos. Colocar um cabeçalho para a coluna derivada.
 SELECT ValorMulta * 1.1 "NovoValor" FROM Multa
