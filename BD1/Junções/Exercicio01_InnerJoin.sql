@@ -156,6 +156,17 @@ WHERE TAB_Pedido.CodVendedor = 15 AND TAB_Cliente.Cidade ='SOROCABA' OR TAB_Clie
 
 -- 07. Listar o código do cliente, nome do cliente e o total de pedidos que cada um realizou:
 
+-- Soluções em partes:
+-- 01) SELECT TAB_Cliente.CodCliente, count(*) as TOTAL
+--     FROM TAB_Pedido
+--     GROUP BY TAB_Cliente.CodCliente;
+
+-- 02) SELECT TAB_Cliente.CodCliente, count(*) as TOTAL
+--     FROM TAB_Pedido 
+
+--     INNER JOIN TAB_Cliente ON TAB_Pedido.CodCliente = TAB_Cliente.CodCliente
+--     GROUP BY TAB_Cliente.CodCliente, TAB_Cliente.NomeCliente;
+
 SELECT TAB_Cliente.CodCliente, TAB_Cliente.NomeCliente, count(TAB_Pedido.CodCliente)
 FROM TAB_Pedido
 
