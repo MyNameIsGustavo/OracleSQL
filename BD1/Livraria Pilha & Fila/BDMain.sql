@@ -1,7 +1,7 @@
 -- Criando as tabelas.
 
-create table Cliente(
-	Codcliente number(6) not null,
+create table Cliente
+(	Codcliente number(6) not null,
 	CodEndereco number(6),
 	Nome varchar2(40) not null,
 	Telefone varchar2(20),
@@ -9,8 +9,8 @@ create table Cliente(
 	CPF varchar2(20)
 );
 
-create table Endereco(
-	CodEndereco number(6) not null,
+create table Endereco
+(	CodEndereco number(6) not null,
 	Numero varchar2(5) not null,
 	CEP varchar2(20) not null,
 	Logradouro varchar2(50) not null,
@@ -18,13 +18,13 @@ create table Endereco(
 	Cidade varchar2(40)
 );
 
-create table Cli_End(
-	CodCliente number(6) not null,
+create table Cli_End
+(	CodCliente number(6) not null,
 	CodEndereco number(6) not null
 );
 
-create table Pedido(
-	CodPedido number(10) not null,
+create table Pedido
+(	CodPedido number(10) not null,
 	CodCliente number(6) not null,
 	CodPagamento number(10),
 	DataPedido date,
@@ -33,35 +33,35 @@ create table Pedido(
 	PrecoTotal number(8,2)
 );
 
-create table Pagamento(
-	CodPagamento number(10) not null,
+create table Pagamento
+(	CodPagamento number(10) not null,
 	DataPagamento date ,
 	FormaPagamento char (1) check (FormaPagamento in('B', 'C'))
 );
 
-create table Cartao(
-	CodPagamento number(10) not null,
+create table Cartao
+(	CodPagamento number(10) not null,
 	NumeroCartao varchar2(20) not null,
 	Parcelas number(2),
 	Juros number(4,2),
 	Bandeira varchar2(20)
 );
 
-create table Boleto(
-	CodPagamento number(6) not null,
+create table Boleto
+(	CodPagamento number(6) not null,
 	Validade date,
 	Banco varchar2(20),
 	NumCodBarra varchar2(100)
 );
 
-create table Item_Ped(
-	CodPedido number(10) not null,
+create table Item_Ped
+(	CodPedido number(10) not null,
 	CodLivro number(6) not null,
 	Quantidade number(2) not null
 );
 
-create table Livro(
-	CodLivro number(6) not null,
+create table Livro
+(	CodLivro number(6) not null,
 	CodGenero number(6) not null,
 	CodEditora number(6) not null,
 	CodAutor number(6) not null,
@@ -71,22 +71,21 @@ create table Livro(
 	Preco number(5,2)
 );
 
-create table Liv_Aut(
-	CodLivro number(6) not null,
+create table Liv_Aut
+(	CodLivro number(6) not null,
 	CodAutor number(6) not null
 );
 
-create table Autores(
-	CodAutor number(6) not null,
+create table Autores
+(	CodAutor number(6) not null,
 	Nome varchar2(50) not null,
 	Nacionalidade varchar2(20),
 	QtdeObras number(5),
 	DataNascimento date
-	
 );
 
-create table Editora(
-	CodEditora number(6) not null,
+create table Editora
+(	CodEditora number(6) not null,
 	Endereco varchar2(50),
 	Nome varchar2(40) not null,
 	CNPJ varchar2(20),
@@ -227,3 +226,146 @@ INSERT INTO Item_Ped VALUES(003,111,1);
 INSERT INTO Item_Ped VALUES(004,333,4);
 INSERT INTO Item_Ped VALUES(004,222,1);
 INSERT INTO Item_Ped VALUES(005,222,3);
+
+-- Objetivo da questão: Acrescenta a nova coluna ‘data de inclusão’ na tabela cliente.
+-- 1- Acrescente uma coluna nova “data de inclusão” no formato date, na primeira tabela criada.
+ALTER TABLE Cliente ADD DataInclusao DATE;
+
+-- Objetivo da questão: Alterar o valor da coluna DataInclusao adicionando a data do sistema na primeira tabela criada (Cliente).
+-- 2- Altere o valor desta coluna colocando a data do sistema.
+UPDATE Cliente SET DataInclusao = SYSDATE;
+
+-- Objetivo da questão: Alterar o tamanho da coluna frete da tabela pedido. 
+-- 3- Altere o tamanho de qualquer campo da tabela principal de seu sistema e acrescente a restrição de não permitir valores nulos.
+ALTER TABLE Pedido MODIFY Frete NUMBER(8,2) NOT NULL;
+
+-- Objetivo da questão: Excluir a coluna DataInclusao da primeira tabela criada (Cliente);
+-- 4- Excluir a coluna acrescentada na questão 1.
+ALTER TABLE Cliente DROP COLUMN DataInclusao;
+
+-- Objetivo da questão: Alterar o conteúdo da coluna frete da tabela pedido.
+-- 5- Escreva um comando que altere o conteúdo de uma coluna (escolha qq tabela).
+UPDATE Pedido
+SET Frete = 10.00
+WHERE CODPEDIDO = 001;
+
+-- Objetivo da questão: Listar todos os títulos de livros e seus autores que terminam com a palavra ‘Souza’.
+-- 6- Escreva um comando Select utilizando a cláusula LIKE.
+SELECT L.titulo, A.nome FROM autores A
+INNER JOIN liv_aut LA ON A.CODAUTOR = LA.CODAUTOR
+INNER JOIN livro L ON LA.CODLIVRO = L.CODLIVRO
+WHERE A.NOME LIKE '%Souza';
+
+-- Objetivo da questão: Listar os títulos dos livros e o seu gênero, ordenando o resultado através do gênero do livro. 
+-- 7- Escreva um comando Select que utilize a cláusula where com 2 condições, e order by. 
+SELECT L.titulo,G.nome FROM Genero G 
+INNER JOIN Livro L on G.codgenero = L.codgenero
+WHERE G.CodGenero = 2 or G.CodGenero = 5
+order by G.nome DESC;
+
+-- Objetivo da questão: Listar todos os bancos e bandeiras usadas em pagamentos sem repetições.
+-- 8- Escreva um comando Select utilizando a cláusula distinct.
+SELECT DISTINCT  B.Banco FROM Boleto B
+INNER JOIN Pagamento PAG on PAG.codpagamento = B.codpagamento
+UNION
+SELECT DISTINCT C.Bandeira FROM Cartao C
+INNER JOIN Pagamento PAG on PAG.codpagamento = C.codpagamento;
+
+-- Objetivo da questão: O boleto tem validade de três dias. Portanto, devem ser listados todos os boletos vencidos.
+-- 9- Escreva um comando que utilize uma função de soma de datas dentro da cláusula where.
+select NUMCODBARRA, VALIDADE from Boleto
+where (Validade+3) < Sysdate;
+
+-- Objetivo da questão: Listar os clientes cadastrados mostrando o dia, mês, ano, hora, minuto e segundo em que a pesquisa foi feita utilizando a data do sistema do banco de dados. 
+-- 10- Escreva um comando select para listar a data do sistema mostrando dia, mês, ano, hora, minuto e segundo. 
+SELECT to_char(sysdate, 'DD/MM/YYYY HH24:MI:SS') as Clientes_Cadastrados_Nessa_Data from dual
+union
+select Nome from cliente;
+
+-- Objetivo da questão: Listar o título do livro, o ano de publicação, preço, nome da editora e contato da editora.
+-- 11- Escreva um exemplo de junção entre 2 tabelas que retorne várias linhas. 
+select L.titulo,L.Datapubli,L.preco,E.Nome,E.contato from LIVRO L
+inner join EDITORA E on L.CodEditora=E.CodEditora;
+
+-- Objetivo da questão: Listar o nome do cliente, taxa de desconto e forma de pagamento para todos os pedidos que foram feitos com o pagamento por boleto.
+-- 12- Escreva um exemplo de junção entre 3 tabelas. 
+SELECT C.Nome, P.Desconto, PG.FormaPagamento FROM Cliente C
+INNER JOIN Pedido P ON C.CodCliente = P.CodCliente
+INNER JOIN Pagamento PG ON P.CodPagamento = PG.CodPagamento
+WHERE PG.FormaPagamento = 'B';
+
+-- Objetivo da questão: Listar o codigo do cliente, nome e quantos pedidos ele já fez.
+-- 13- Dê um exemplo de comando DML que utilize a função count(*). 
+SELECT C.CodCliente, C.Nome, count(P.CodCliente) FROM Pedido P
+INNER JOIN Cliente C ON C.CodCliente = P.CodCliente
+GROUP BY C.CodCLiente, C.Nome;
+
+--Objetivo da questão: Somar os valores das vendas e renomear a coluna para “VALOR_TOTAL_DAS_VENDAS”.
+--14- Dê um exemplo de comando DML que utilize a função Sum(). 
+SELECT SUM(PrecoTotal) as VALOR_TOTAL_DAS_VENDAS from Pedido;
+
+-- Objetivo da questão: Listar o valor total dos pedidos feitos agrupando em cada forma de pagamento.
+-- 15- Explique para que serve a cláusula group by e dê 1 exemplo de sua utilização. 
+-- Resposta: O group by é usado para agrupar linhas de uma tabela que tem os mesmos valores em todas as colunas da lista.
+SELECT PAG.formapagamento, SUM(P.precototal) 
+from Pagamento PAG
+INNER JOIN Pedido P ON P.codpagamento = PAG.codpagamento
+GROUP BY PAG.formapagamento;
+
+-- Objetivo da questão: Listar os livros agrupando o resultado obtido pela editora.
+-- 16- Dê um exemplo usando a junção de tabelas com a cláusula Group by. 
+SELECT C.nome, SUM(P.precototal) as Total_Gasto from Cliente C 
+INNER JOIN Pedido P on P.CodCliente = C.CodCliente
+GROUP BY C.nome;
+
+-- Objetivo da questão: Listar o nome dos clientes, valor do pedido para pedidos que tenham valor maior que R $80.00.
+-- 17- Explique para que serve a cláusula having e dê 1 exemplo de sua utilização. 
+-- A cláusula HAVING filtra os resultados fornecidos a partir de um agrupamento de registros que é feito por um GROUP BY. Funciona como a cláusula WHERE.
+
+SELECT C.nome, SUM(P.precototal) as Total_Gasto from Cliente C 
+INNER JOIN Pedido P on P.CodCliente = C.CodCliente
+GROUP BY C.nome
+HAVING SUM(P.precototal) > 80.00;
+
+-- Objetivo da questão: Para cada pedido feito listar, o código do cliente, nome do cliente, logradouro, número do endereço, CEP, código do pedido, data do pedido, frete e valor do pedido(somando o preço de todos os livros incluídos no pedido).
+-- 18- Usando junção de várias tabelas, escreva um comando que liste os campos do documento principal gerado pelo seu sistema. Onde houver chave estrangeira liste a descrição correspondente. Por exemplo=> em “Assinatura de Revista”, deve haver um código de assinante. Neste caso, liste o nome do assinante além do código deste. 
+SELECT C.codcliente, C.nome, E.logradouro, E.numero, E.cep, P.codpedido, P.datapedido, P.frete, SUM(L.preco) as VALOR_PEDIDO
+FROM Cliente C
+
+INNER JOIN Cli_End CE ON C.codcliente = CE.codcliente
+INNER JOIN Endereco E ON CE.codendereco = E.codendereco 
+INNER JOIN Pedido P ON C.codcliente = P.codcliente 
+INNER JOIN Item_Ped IP ON P.codpedido = IP.codpedido
+INNER JOIN Livro L ON IP.codlivro = L.codlivro
+
+GROUP BY C.codcliente, C.nome, E.logradouro, E.numero, E.cep, P.codpedido, P.datapedido, P.frete;
+
+-- Objetivo da questão: Criar uma tabela contendo o código do cliente, nome e código do pedido.
+-- 19- Dê um exemplo de como você pode criar uma tabela a partir de outra já existente.
+CREATE TABLE ClienteCopia AS
+SELECT C.codcliente, C.nome, P.codpedido
+FROM Cliente C
+INNER JOIN Pedido P on P.codcliente = C.codcliente;
+
+-- Objetivo da questão: Responder o questionamento proposto.
+-- 20- Para a criação das tabelas deste exercício foi necessário estabelecer uma ordem? Justifique. 
+-- Resposta: Não, devido às instruções de desenvolvimento do projeto, a criação das tabelas foi feita antes da adição das primaries keys(PK’s) e foreigners keys(FK' s). 
+
+-- Objetivo da questão: Listar o nome dos clientes e dos autores em uma única tabela.
+-- 21-Dê um exemplo de uma consulta usando a operação de união.
+SELECT Nome FROM Cliente
+UNION
+SELECT Nome FROM Autores
+ORDER BY Nome ASC;
+
+-- Objetivo da questão:  Listar os clientes com pedidos registrados.
+-- 22-Dê um exemplo de uma consulta usando a operação de interseção. 
+SELECT CodCliente from Pedido
+INTERSECT
+SELECT CodCliente from Cliente;
+
+-- Objetivo da questão: Listar os clientes que não tem compras registradas.
+-- 23-Dê um exemplo de uma consulta usando a operação de diferença.
+SELECT codcliente from Cliente
+MINUS 
+SELECT  codcliente from Pedido;
