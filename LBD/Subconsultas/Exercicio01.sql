@@ -1,0 +1,92 @@
+CREATE TABLE tb_cliente( 
+  	codcliente number(5) NOT NULL,
+  	nomecliente varchar2(30) NOT NULL,
+  	endereco varchar2(30),
+ 	cidade varchar2(20),
+  	cep varchar2(10),
+  	uf char(2)
+);
+
+CREATE TABLE tb_vendedor( 
+  	codvendedor number(5) NOT NULL,
+  	nomevendedor varchar2(30) NOT NULL,
+  	faixa_com    number(4,2),
+  	salario_fixo number(7,2)
+);
+
+CREATE TABLE tb_produto( 
+	codproduto   number(5) NOT NULL,
+  	descricao varchar(20),
+  	unid       char(2),
+  	valor_unit number(6,2)
+);
+
+CREATE TABLE TB_PEDIDO( 
+  	NUMPEDIDO     number(5) NOT NULL,
+  	PRAZO_ENTREGA DATE,
+  	CODCLIENTE     number(5),
+  	CODVENDEDOR   number(5)
+);
+
+CREATE TABLE TB_ITEM_PEDIDO(
+	NUMPEDIDO   number(5) NOT NULL,
+ 	CODPRODUTO  number(5) NOT NULL,
+ 	QTDE        number(5)
+);
+
+ALTER TABLE TB_CLIENTE ADD CONSTRAINT PK_CLIENTE_CODCLIENTE PRIMARY KEY(CODCLIENTE);
+ALTER TABLE TB_PRODUTO ADD CONSTRAINT PK_PRODUTO_CODPRODUTO PRIMARY KEY(CODPRODUTO);
+ALTER TABLE TB_VENDEDOR ADD CONSTRAINT PK_VENDEDOR_CODVENDEDOR PRIMARY KEY(CODVENDEDOR);
+ALTER TABLE TB_PEDIDO ADD CONSTRAINT PK_PEDIDO_NUMPEDIDO PRIMARY KEY(NUMPEDIDO);
+ALTER TABLE TB_ITEM_PEDIDO ADD CONSTRAint  PK_ITEMPEDIDO_PEDPROD PRIMARY KEY(NUMPEDIDO,CODPRODUTO);
+
+ALTER TABLE TB_PEDIDO ADD CONSTRAINT FK_PEDIDO_CODCLI FOREIGN KEY(CODCLIENTE) REFERENCES TB_CLIENTE;
+ALTER TABLE TB_PEDIDO ADD CONSTRAINT FK_PEDIDO_CODVENDEDOR FOREIGN KEY(CODVENDEDOR) REFERENCES TB_VENDEDOR;
+
+ALTER TABLE TB_ITEM_PEDIDO ADD CONSTRAINT FK_ITEMPEDIDO_NUMPEDIDO FOREIGN KEY(NUMPEDIDO) REFERENCES TB_PEDIDO;
+ALTER TABLE TB_ITEM_PEDIDO ADD CONSTRAINT FK_ITEMPEDIDO_CODPRODUTO FOREIGN KEY(CODPRODUTO) REFERENCES TB_PRODUTO;
+
+INSERT INTO TB_vendedor VALUES (5,'Antonio Pedro', 5.0, 400);
+INSERT INTO TB_vendedor VALUES (15,'Carlos Sola', 0.0, 400);
+INSERT INTO tb_vendedor VALUES (25,'Ana Carolina', 1.0, 200);
+INSERT INTO TB_vendedor VALUES (35,'Solange Almeida', 1.0, 300);
+
+INSERT INTO TB_CLIENTE VALUES (30, 'João da Silva', 'AV. MATT HOFFMANN, 1100', 'SÃO PAULO', '97056-001', 'SP');
+INSERT INTO TB_CLIENTE VALUES (31, 'LUCAS ANTUNES', 'RUA TRODANI, 120', 'SOROCABA', '19658-023', 'SP');
+INSERT INTO Tb_CLIENTE VALUES (32, 'LAURA STRAUSS', 'RUA TULIPAS, 650', 'PRIMAVERA', '18556-025', 'SP');
+
+INSERT INTO TB_PRODUTO VALUES (11, 'APPLE DISPLAY', 'UN', 975.99);
+INSERT INTO TB_PRODUTO VALUES (12, 'IBM THINK PAD R61', 'UN', 999.70);
+INSERT INTO TB_PRODUTO VALUES (13, 'PÓ PARA TONER', 'KG', 85.60);
+
+INSERT INTO TB_PEDIDO VALUES (7, to_date('26-02-2019', 'DD-MM-YYYY'), 31, 15);
+INSERT INTO TB_PEDIDO VALUES (8, to_date('23/05/2019', 'DD-MM-YYYY'), 32, 25);
+INSERT INTO TB_PEDIDO VALUES (9, to_date('21/02/2019', 'DD-MM-YYYY'), 32, 5);
+INSERT INTO TB_PEDIDO VALUES (10, to_date('20/02/2019', 'DD-MM-YYYY'), 30, 5);
+
+INSERT INTO TB_ITEM_PEDIDO VALUES (7, 11, 3);
+INSERT INTO TB_ITEM_PEDIDO VALUES (7, 12, 3);
+
+INSERT INTO TB_ITEM_PEDIDO VALUES (8, 13, 3);
+INSERT INTO TB_ITEM_PEDIDO VALUES (9, 11, 3);
+INSERT INTO TB_ITEM_PEDIDO VALUES (10, 11, 3);
+INSERT INTO TB_ITEM_PEDIDO VALUES (10, 12, 3);
+INSERT INTO TB_ITEM_PEDIDO VALUES (10, 13, 3);
+
+-- 1. Listar todos os clientes que moram na mesma cidade que 'João da Silva'.
+SELECT * FROM tb_cliente
+WHERE cidade IN (SELECT cidade FROM tb_cliente WHERE nomecliente = 'João da Silva');
+
+-- 2. Qual o nome dos vendedores que tem o salário fixo menor que a média dos salários dos vendedores.
+SELECT nomevendedor FROM tb_vendedor
+WHERE salario_fixo <= (SELECT AVG(salario_fixo) FROM tb_vendedor);
+
+-- 3. Quais os nomes dos clientes que só compraram com o vendedor com codigo 05 e com mais nenhum outro vendedor (fidelidade).
+SELECT TC.nomecliente FROM tb_cliente TC
+INNER JOIN tb_pedido TP ON TC.codcliente = TP.codcliente
+WHERE TP.codvendedor IN (SELECT TP.codvendedor FROM tb_pedido TP WHERE TP.codvendedor = 5);
+
+-- 4. Quais vendedores não fizeram mais de 2 pedidos.
+SELECT TV.nomevendedor FROM tb_vendedor TV
+INNER JOIN tb_pedido TP ON TV.codvendedor = TP.codvendedor
+GROUP BY TP.codvendedor, TV.nomevendedor HAVING COUNT(TP.codvendedor) <= 2;  
