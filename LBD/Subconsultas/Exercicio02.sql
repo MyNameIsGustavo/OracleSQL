@@ -1,19 +1,19 @@
 CREATE TABLE TB_Funcionario
-(	CodFunc number(5) PRIMARY KEY,
+(   CodFunc number(5) PRIMARY KEY,
     NomeFunc varchar2(30),
     Sexo char(1),
-	DataAdmissao date,
+    DataAdmissao date,
     Salario number(7,2)
 )
 
 CREATE TABLE TB_Projeto
-(	CodProjeto number(3) PRIMARY KEY,
-	Descricao varchar2(30)
+(   CodProjeto number(3) PRIMARY KEY,
+    Descricao varchar2(30)
 )
 
 CREATE TABLE TB_FuncProj
-(	CodFunc number(5) REFERENCES TB_Funcionario,
-	CodProjeto number(3) REFERENCES TB_Projeto,
+(   CodFunc number(5) REFERENCES TB_Funcionario,
+    CodProjeto number(3) REFERENCES TB_Projeto,
     TempoAlocacao number(2),
     BonusSalario number(7,2),
     PRIMARY KEY(CodFunc, CodProjeto)
