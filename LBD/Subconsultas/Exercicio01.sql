@@ -73,20 +73,66 @@ INSERT INTO TB_ITEM_PEDIDO VALUES (10, 11, 3);
 INSERT INTO TB_ITEM_PEDIDO VALUES (10, 12, 3);
 INSERT INTO TB_ITEM_PEDIDO VALUES (10, 13, 3);
 
--- 1. Listar todos os clientes que moram na mesma cidade que 'João da Silva'.
-SELECT * FROM tb_cliente
-WHERE cidade IN (SELECT cidade FROM tb_cliente WHERE nomecliente = 'João da Silva');
+-- 01. Listar todos os clientes que moram na mesma cidade que 'João da Silva'.
+SELECT C.nomecliente FROM TB_Cliente C
+WHERE C.nomecliente <> 'João da Silva' AND 
+C.cidade = (SELECT  C.cidade FROM TB_Cliente C WHERE C.nomecliente = 'João da Silva');
 
--- 2. Qual o nome dos vendedores que tem o salário fixo menor que a média dos salários dos vendedores.
-SELECT nomevendedor FROM tb_vendedor
-WHERE salario_fixo <= (SELECT AVG(salario_fixo) FROM tb_vendedor);
+-- 02.	Qual o nome dos vendedores que  tem o salário fixo  menor  que a média dos salários dos vendedores.
+SELECT V.nomevendedor FROM TB_Vendedor V
+WHERE V.salario_fixo < (SELECT AVG(V.salario_fixo) FROM TB_Vendedor V);
 
--- 3. Quais os nomes dos clientes que só compraram com o vendedor com codigo 05 e com mais nenhum outro vendedor (fidelidade).
-SELECT TC.nomecliente FROM tb_cliente TC
-INNER JOIN tb_pedido TP ON TC.codcliente = TP.codcliente
-WHERE TP.codvendedor IN (SELECT TP.codvendedor FROM tb_pedido TP WHERE TP.codvendedor = 5);
+-- 03.	Quais os nomes dos clientes que só compraram com o vendedor com codigo 05 e com mais nenhum outro vendedor (fidelidade).
+SELECT C.codcliente, C.nomecliente FROM TB_Pedido P 
+INNER JOIN TB_Cliente C ON P.codcliente = C.codcliente
+WHERE P.codvendedor = 5 AND C.codcliente NOT IN 
+(SELECT P.codcliente FROM TB_Pedido P WHERE TP.codvendedor <> 5);
+	
+-- 04. Quais vendedores não fizeram mais de 2 pedidos.
+SELECT V.codvendedor, V.nomevendedor FROM TB_Vendedor V
+WHERE V.codvendedor NOT IN 
+(SELECT P.codvendedor FROM TB_Pedido P GROUP BY P.codvendedor HAVING COUNT(*) > 2);
 
--- 4. Quais vendedores não fizeram mais de 2 pedidos.
-SELECT TV.nomevendedor FROM tb_vendedor TV
-INNER JOIN tb_pedido TP ON TV.codvendedor = TP.codvendedor
-GROUP BY TP.codvendedor, TV.nomevendedor HAVING COUNT(TP.codvendedor) <= 2;  
+-- 05. Quais os vendedores não fizeram nenhum pedido no mês de maio/2019
+-- USANDO NOT IN
+SELECT V.nomevendedor FROM TB_Vendedor V
+WHERE V.codvendedor NOT IN (SELECT P.codvendedor FROM TB_Pedido P
+   			    WHERE prazo_entrega BETWEEN '01-05-2019' AND '31-05-2019');
+
+-- USANDO NOT EXISTS
+
+SELECT V.nomevendedor FROM TB_Vendedor V
+(SELECT 1 FROM TB_Pedido P
+WHERE prazo_entrega BETWEEN '01-05-2019' AND '31-05-2019' 
+AND P.CodVendedor = V.CodVendedor);
+
+-- 06.	Listar o nome do vendedor que mais fez pedidos.
+
+SELECT P.codvendedor, V.nomevendedor, COUNT(*) FROM TB_pedido P 
+INNER JOIN TB_vendedor V ON P.codvendedor = V.codvendedor
+GROUP BY P.codvendedor, V.nomevendedor
+HAVING COUNT(*) = (SELECT MAX (COUNT(*)) FROM TB_pedido P GROUP BY P.CODVENDEDOR)
+
+-- 07.	Listar o nome dos clientes e o número total de pedidos associados a cada 
+cliente em ordem decrescente de vendas, isto é do cliente que mais tem pedidos 
+para o que menos tem.
+
+SELECT P.codcliente, C.nomecliente, COUNT(*) AS TOTAL FROM TB_pedido P, TB_cliente C
+WHERE P.codcliente = C.codcliente
+GROUP BY P.codcliente, C.nomecliente
+ORDER BY TOTAL DESC;
+
+-- 08.	Excluir  todos os itens dos pedidos feitos pelo cliente de código = 31.
+
+DELETE tb_item_pedido IP
+WHERE IP.numpedido IN(SELECT P.numpedido FROM TB_pedido P WHERE P.codcliente = 31);
+
+rollback;
+
+-- 09.	Alterar o valor unitário de todos os produtos sem vendas no ano de 2020 para menos 20%.
+    
+UPDATE TB_produto P SET P.valor_unit = P.valor_unit * 0.8
+WHERE P.codproduto NOT IN
+( SELECT P.codproduto FROM TB_item_pedido IP, TB_pedido PE
+WHERE IP.numpedido = PE.numpedido AND PE.prazo_entrega BETWEEN 
+'01-01-2020' AND '31-12-2020');
