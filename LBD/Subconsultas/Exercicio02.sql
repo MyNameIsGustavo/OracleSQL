@@ -63,3 +63,22 @@ WHERE NOT EXISTS(SELECT FP.CodProjeto FROM TB_FuncProj FP WHERE FP.CodProjeto = 
 SELECT P.CodProjeto FROM TB_projeto P
 MINUS
 SELECT FP.CodProjeto FROM TB_FuncProj FP;
+
+-- 03[D]: Usando o operador EXISTS.
+SELECT F.CodFunc,  F.NomeFunc, P.CodProjeto FROM TB_Projeto P
+INNER JOIN TB_FuncProj FP ON FP.CodProjeto = P.CodProjeto
+INNER JOIN TB_Funcionario F ON FP.CodFunc = F.CodFunc
+WHERE F.CodFunc = 3 AND F.CodFunc 
+NOT IN (SELECT F.CodFunc FROM TB_Funcionario F WHERE F.CodFunc <> 3);
+
+	--- Exercicios Extras ---
+
+-- Retornar apenas os códigos dos projetos que tem funcionarios.
+SELECT P.CodProjeto from TB_Projeto P
+WHERE EXISTS(SELECT 'a' FROM TB_FuncProj FP WHERE P.CodProjeto = FP.CodProjeto);
+
+-- Retornar os funcionarios que mais estão em projetos.
+SELECT FP.CodFunc, F.NomeFunc, COUNT(*) AS QTDE_Projeto FROM TB_Funcionario F
+INNER JOIN TB_FuncProj FP ON FP.CodFunc = F.CodFunc
+GROUP BY FP.CodFunc, F.NomeFunc 
+HAVING COUNT(*) = (SELECT MAX(COUNT(*)) FROM TB_FuncProj FP GROUP BY FP.CodFunc);
